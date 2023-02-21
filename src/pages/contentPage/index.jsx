@@ -1,13 +1,13 @@
-import { Table } from 'antd';
-import wordApi from 'api/wordApi';
-import SearchBar from 'components/searchBar';
-import { column } from 'constant/common';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
-import { setSearchData } from 'searchSlice';
+import { List, Table } from "antd";
+import wordApi from "api/wordApi";
+import SearchBar from "components/searchBar";
+import { column } from "constant/common";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { setSearchData } from "searchSlice";
 
-export default function ContentComponent({type}) {
+export default function ContentComponent({ type }) {
   const searchData = useSelector((state) => state.search.searchData);
   const dispatch = useDispatch();
   const [wordData, setWordData] = useState([]);
@@ -15,12 +15,15 @@ export default function ContentComponent({type}) {
   useEffect(() => {
     const getHomophones = async () => {
       try {
-        const response = await wordApi.getWords({[type]: searchData});
+        const response = await wordApi.getWords({
+          [type]: searchData,
+          md: "d",
+        });
         setWordData(response);
       } catch (error) {
         console.log(error);
       }
-    }
+    };
     getHomophones();
   }, [searchData, type]);
 
@@ -28,32 +31,49 @@ export default function ContentComponent({type}) {
     const columnsParse = column.map((el) => {
       return {
         ...el,
-        render : (data) => {
-          if (el.dataIndex === 'word') {
+        render: (data, record) => {
+          if (el.dataIndex === "word") {
             return (
-              <b 
+              <b
                 onClick={() => {
-                  dispatch(setSearchData(data))
+                  dispatch(setSearchData(data));
                 }}
                 className="cursor-pointer"
-              >{data}</b>
-            )
+              >
+                {data}
+              </b>
+            );
+          }
+          if (el.dataIndex === "type") {
+            return <p>{}</p>;
           }
           return data;
-        }
-      }
-    })
+        },
+      };
+    });
     setColumns(columnsParse);
-  },[dispatch])
+  }, [dispatch]);
   return (
     <>
       <SearchBar />
-      <Table 
-        columns={columns}
+      <h2>Các từ tìm được:</h2>
+      <List
+        pagination={wordData.length > 0 ? "bottomLeft" : "none"}
         dataSource={wordData}
-        pagination={wordData.length > 0 ? 'bottomLeft' : 'none'}
-        rowKey={(record) => record?.word}
-       />
+        renderItem={(item, index) => (
+          <List.Item key={item.word} className="list-item">
+            <div>
+              <b>{index + 1}.</b>
+              <span className="title"> {item?.word}</span>
+            </div>
+            <ul>
+              {item?.defs?.map((def) => (
+                <li className="item-def">{def}</li>
+              ))}
+            </ul>
+          </List.Item>
+        )}
+      />
     </>
-  )
+  );
 }
