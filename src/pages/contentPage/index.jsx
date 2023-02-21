@@ -66,9 +66,11 @@ export default function ContentComponent({ type }) {
               <b>{index + 1}.</b>
               <span className="title"> {item?.word}</span>
             </div>
-            <ul>
-              {item?.defs?.map((def) => (
-                <li className="item-def">{def}</li>
+            <ul className="list-def">
+              {item?.defs?.map((def, index) => (
+                <li key={index} className="item-def">
+                  {def}
+                </li>
               ))}
             </ul>
           </List.Item>

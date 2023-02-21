@@ -12,6 +12,11 @@
   display: list-item !important;
 }
 
+.list-def {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
 .item-def {
   color: rgb(0, 116, 87);
 }
